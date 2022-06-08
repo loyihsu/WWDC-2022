@@ -44,8 +44,5 @@ public struct RangeDatePicker: View {
                 guard fullRange.canMake else { return }
                 selectedDates = fullRange.formComponentSet(calendar: calendar)
             }
-            .onAppear {
-                selectedDates = Set( [calendar.dateComponents(in: .current, from: calendar.startOfDay(for: Date()))] )
-            }
     }
 }
