@@ -6,7 +6,7 @@ public struct RangeDatePicker: View {
     @Binding var selectedDates: Set<DateComponents>
     @Environment(\.calendar) var calendar
 
-    @State private var fullRange = FullRangeMaker()
+    @State private var rangeMaker = FullRangeMaker()
 
     public init(_ titleKey: LocalizedStringKey, selectedDates: Binding<Set<DateComponents>>) {
         self.titleKey = titleKey
@@ -14,35 +14,21 @@ public struct RangeDatePicker: View {
     }
 
     public var body: some View {
-        MultiDatePicker(titleKey, selection: $selectedDates)
-            .onChange(of: selectedDates) { selected in
-                guard fullRange.start == nil || fullRange.end == nil else {
-                    if selectedDates != fullRange.formComponentSet(calendar: calendar) {
-                        selectedDates = []
-                    }
-                    fullRange = FullRangeMaker()
-                    return
+        MultiDatePicker(titleKey, selection: bindSelectedDates())
+    }
+
+    private func bindSelectedDates() -> Binding<Set<DateComponents>> {
+        return Binding<Set<DateComponents>>(
+            get: {
+                let newRange = rangeMaker.form(with: calendar)
+                DispatchQueue.main.async {
+                    self.selectedDates = newRange
                 }
-
-                if fullRange.isReset && selectedDates.count > 1 {
-                    selectedDates = []
-                    return
-                }
-
-                let dates = selected.compactMap { calendar.date(from: $0) }
-
-                guard let min = dates.min(),
-                      let max = dates.max() else { return }
-
-                if min != max {
-                    fullRange = FullRangeMaker(start: min, end: max)
-                } else {
-                    fullRange = FullRangeMaker(start: min)
-                }
+                return newRange
+            },
+            set: { newSelection in
+                rangeMaker.step(with: calendar, newSelection)
             }
-            .onChange(of: fullRange) { newRange in
-                guard fullRange.canMake else { return }
-                selectedDates = fullRange.formComponentSet(calendar: calendar)
-            }
+        )
     }
 }

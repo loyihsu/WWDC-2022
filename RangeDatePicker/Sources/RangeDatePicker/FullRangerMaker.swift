@@ -7,41 +7,83 @@
 
 import Foundation
 
-struct FullRangeMaker: Equatable {
-    var start: Date?
-    var end: Date?
-
+struct FullRangeMaker {
     var isReset: Bool {
-        start == nil && end == nil
+        if case .none = step {
+            return true
+        }
+        return false
     }
 
-    var canMake: Bool {
-        start != nil && end != nil
+    var canForm: Bool {
+        if case .rangeSelected(_, _) = step {
+            return true
+        }
+        return false
     }
 
-    init(start: Date? = nil, end: Date? = nil) {
-        self.start = start
-        self.end = end
+    init() { }
+
+    mutating func step(with calendar: Calendar, _ dates: Set<DateComponents>) {
+
+        let selectedDate: DateComponents?
+
+        let currentRange = self.form(with: calendar)
+        let newDates = dates.filter { !currentRange.contains($0) }
+
+        if newDates.count == 1, let first = newDates.first {
+            selectedDate = first
+        } else {
+            selectedDate = nil
+        }
+
+        guard let selectedDate = selectedDate, let date = calendar.date(from: selectedDate) else {
+            return
+        }
+
+        switch step {
+        case .none:
+            step = .startSelected(start: date)
+        case .startSelected(start: let start):
+            let min = min(start, date)
+            let max = max(start, date)
+            step = .rangeSelected(start: min, end: max)
+        case .rangeSelected(_, _):
+            step = .startSelected(start: date)
+        }
     }
 
-    func form() -> [Date] {
-        guard let min = self.start,
-              let max = self.end,
-              min != max else { return [] }
+    func form(with calendar: Calendar) -> Set<DateComponents> {
+        switch step {
+        case .none:
+            return []
+        case .startSelected(start: let date):
+            let component = calendar.dateComponents(in: .current, from: date)
+            return [component]
+        case .rangeSelected(start: let start, end: let end):
+            let range = makeRange(min: start, max: end)
+                .map {
+                    calendar.dateComponents(in: .current, from: $0)
+                }
+            return Set(range)
+        }
+    }
+
+    // MARK: - Private Helper
+    private enum Step {
+        case none
+        case startSelected(start: Date)
+        case rangeSelected(start: Date, end: Date)
+    }
+
+    private var step: Step = .none
+
+    private func makeRange(min: Date, max: Date) -> [Date] {
         var current = min, output = [Date]()
         while current <= max {
             output.append(current)
             current = current.addingTimeInterval(86_400)
         }
         return output
-    }
-
-    func formComponentSet(calendar: Calendar) -> Set<DateComponents> {
-        Set(
-            self.form()
-                .compactMap {
-                    calendar.dateComponents(in: .current, from: $0)
-                }
-        )
     }
 }
