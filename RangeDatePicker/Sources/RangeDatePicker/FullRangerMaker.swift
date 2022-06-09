@@ -22,7 +22,9 @@ struct FullRangeMaker {
         return false
     }
 
-    init() { }
+    init(max maxValue: Int? = nil) {
+        self.maximum = maxValue
+    }
 
     mutating func step(with calendar: Calendar, _ dates: Set<DateComponents>) {
 
@@ -47,6 +49,13 @@ struct FullRangeMaker {
         case .startSelected(start: let start):
             let min = min(start, date)
             let max = max(start, date)
+
+            if let maximum {
+                let maxValue = Double(maximum)
+                let diffDays = max.timeIntervalSince(min) / 86_400
+                guard diffDays <= maxValue else { return }
+            }
+
             step = .rangeSelected(start: min, end: max)
         case .rangeSelected(_, _):
             step = .startSelected(start: date)
@@ -77,6 +86,7 @@ struct FullRangeMaker {
     }
 
     private var step: Step = .none
+    private var maximum: Int?
 
     private func makeRange(min: Date, max: Date) -> [Date] {
         var current = min, output = [Date]()
