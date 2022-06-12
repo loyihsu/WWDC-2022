@@ -21,10 +21,11 @@ try Regex(rule).firstMatch(in: someMarkdownText)
 let builder = Regex {
     OneOrMore(.word)
 }
+
 try builder.firstMatch(in: someMarkdownText)
 
 let markdownHeaderRegex = Regex {
-    Capture { OneOrMore(/#/) }  // Markdown header syntax
+    Capture { OneOrMore(/#/) } // Markdown header syntax
     OneOrMore(" ")
     Capture {
         OneOrMore {
