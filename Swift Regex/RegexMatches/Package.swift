@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "RegexMatches",
     platforms: [
-        .macOS(.v13),
+        .macOS(.v13), .iOS(.v16)
     ],
     products: [
         .library(name: "RegexMatches", targets: ["RegexMatches"]),

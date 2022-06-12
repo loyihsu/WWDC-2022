@@ -1,5 +1,5 @@
-public extension Regex {
-    func matches(in string: String) throws -> [Match] {
+extension Regex {
+    public func matches(in string: String) throws -> [Match] {
         var processingString = string[string.startIndex ..< string.endIndex]
         var output: [Match] = []
         while let match = try firstMatch(in: processingString) {
