@@ -1,6 +1,6 @@
 //
 //  FullRangeMaker.swift
-//  
+//
 //
 //  Created by Yu-Sung Loyi Hsu on 2022/6/8.
 //
@@ -16,21 +16,20 @@ struct FullRangeMaker {
     }
 
     var canForm: Bool {
-        if case .rangeSelected(_, _) = step {
+        if case .rangeSelected = step {
             return true
         }
         return false
     }
 
     init(max maxValue: Int? = nil) {
-        self.maximum = maxValue
+        maximum = maxValue
     }
 
     mutating func step(with calendar: Calendar, _ dates: Set<DateComponents>) {
-
         let selectedDate: DateComponents?
 
-        let currentRange = self.form(with: calendar)
+        let currentRange = form(with: calendar)
         let newDates = dates.filter { !currentRange.contains($0) }
 
         if newDates.count == 1, let first = newDates.first {
@@ -46,18 +45,18 @@ struct FullRangeMaker {
         switch step {
         case .none:
             step = .startSelected(start: date)
-        case .startSelected(start: let start):
+        case let .startSelected(start: start):
             let min = min(start, date)
             let max = max(start, date)
 
             if let maximum {
                 let maxValue = Double(maximum)
-                let diffDays = max.timeIntervalSince(min) / 86_400
+                let diffDays = max.timeIntervalSince(min) / 86400
                 guard diffDays <= maxValue else { return }
             }
 
             step = .rangeSelected(start: min, end: max)
-        case .rangeSelected(_, _):
+        case .rangeSelected:
             step = .startSelected(start: date)
         }
     }
@@ -66,10 +65,10 @@ struct FullRangeMaker {
         switch step {
         case .none:
             return []
-        case .startSelected(start: let date):
+        case let .startSelected(start: date):
             let component = calendar.dateComponents(in: .current, from: date)
             return [component]
-        case .rangeSelected(start: let start, end: let end):
+        case let .rangeSelected(start: start, end: end):
             let range = makeRange(min: start, max: end)
                 .map {
                     calendar.dateComponents(in: .current, from: $0)
@@ -79,6 +78,7 @@ struct FullRangeMaker {
     }
 
     // MARK: - Private Helper
+
     private enum Step {
         case none
         case startSelected(start: Date)
@@ -92,7 +92,7 @@ struct FullRangeMaker {
         var current = min, output = [Date]()
         while current <= max {
             output.append(current)
-            current = current.addingTimeInterval(86_400)
+            current = current.addingTimeInterval(86400)
         }
         return output
     }

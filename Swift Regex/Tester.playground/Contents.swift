@@ -1,5 +1,5 @@
-import RegexBuilder
 import Foundation
+import RegexBuilder
 
 let rawInput = """
 CREDIT    04062020    PayPal transfer    $4.99
@@ -22,9 +22,9 @@ struct Entry {
 let regex = Regex {
     TryCapture {
         ChoiceOf {
-           "CREDIT"
-           "DEBIT"
-       }
+            "CREDIT"
+            "DEBIT"
+        }
     } transform: { substring -> Entry.EntryType? in
         Entry.EntryType(rawValue: String(substring))
     }
@@ -33,7 +33,7 @@ let regex = Regex {
         Repeat(.digit, count: 2)
         Repeat(.digit, count: 2)
         Repeat(.digit, count: 4)
-    } transform: { (substring) -> Date? in
+    } transform: { substring -> Date? in
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMddyyyy"
         return dateFormatter.date(from: String(substring))
@@ -48,7 +48,7 @@ let regex = Regex {
         String(substring)
     }
     OneOrMore(.whitespace)
-        "$"
+    "$"
     TryCapture {
         OneOrMore(.digit)
         "."

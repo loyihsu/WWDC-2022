@@ -10,7 +10,7 @@ public struct RangeDatePicker: View {
 
     public init(_ titleKey: LocalizedStringKey, selectedDates: Binding<Set<DateComponents>>) {
         self.titleKey = titleKey
-        self._selectedDates = selectedDates
+        _selectedDates = selectedDates
     }
 
     public var body: some View {

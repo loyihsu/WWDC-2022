@@ -6,15 +6,14 @@ import PackageDescription
 let package = Package(
     name: "RangeDatePicker",
     platforms: [
-        .iOS(.v16)
+        .iOS(.v16),
     ],
     products: [
         .library(name: "RangeDatePicker", targets: ["RangeDatePicker"]),
     ],
     dependencies: [
-
     ],
     targets: [
-        .target(name: "RangeDatePicker", dependencies: [])
+        .target(name: "RangeDatePicker", dependencies: []),
     ]
 )
