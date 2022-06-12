@@ -44,4 +44,26 @@ final class RegexMatchesTests: XCTestCase {
         XCTAssertEqual(matches[0].1, "*italic text*")
         XCTAssertEqual(matches[1].1, "*I love to eat pasta*")
     }
+
+    func testMutlipleSingleCharacterMatch() throws {
+        let testInput = "I want to match this - **********"
+        let regex = Regex {
+            Capture {
+                "*"
+            }
+        }
+
+        let matches = try regex.matches(in: testInput)
+        XCTAssertEqual(matches.count, 10)
+        XCTAssertEqual(matches[0].1, "*")
+        XCTAssertEqual(matches[1].1, "*")
+        XCTAssertEqual(matches[2].1, "*")
+        XCTAssertEqual(matches[3].1, "*")
+        XCTAssertEqual(matches[4].1, "*")
+        XCTAssertEqual(matches[5].1, "*")
+        XCTAssertEqual(matches[6].1, "*")
+        XCTAssertEqual(matches[7].1, "*")
+        XCTAssertEqual(matches[8].1, "*")
+        XCTAssertEqual(matches[9].1, "*")
+    }
 }
